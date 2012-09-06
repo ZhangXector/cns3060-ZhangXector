@@ -1,4 +1,6 @@
-cns3060-ZhangXector
-===================
+Cliff Kelley
+============
 
-This is the private repository for ZhangXector for 3060
+Class: CS-3060 Operating Systems Theory
+Section: 601
+Email: ZhangXector@gmail.com
