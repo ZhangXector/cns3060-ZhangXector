@@ -3,6 +3,8 @@ cat1
 
 # GDB Debugging
 *.dSYM/
+
+# In-use swap file
 *.swp
 
 # Test text files
