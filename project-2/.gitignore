@@ -1,6 +1,13 @@
 # Executable
 cat1
 
+# GDB Debugging
+*.dSYM
+*.swp
+
+# Test text files
+*.txt
+
 # Compiled Object files
 *.slo
 *.lo
