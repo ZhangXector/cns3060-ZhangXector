@@ -2,7 +2,7 @@
 cat1
 
 # GDB Debugging
-*.dSYM
+*.dSYM/
 *.swp
 
 # Test text files
