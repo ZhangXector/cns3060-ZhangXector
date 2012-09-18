@@ -12,19 +12,25 @@ int main(int argc, char* argv[])
 	int cmpResult;
 	int type = 0;
 
-	cmpResult = (argv[1][0] - '-');
-	if(cmpResult == 0)
+	if(argc > 2)
 	{
-		cmpResult = strcmp(argv[1], "-n");
-		if(cmpResult != 0)
+		cmpResult = (argv[1][0] - '-');
+		if(cmpResult == 0)
 		{
-			printf("%s is not a recognized command. Usage: ./cat1 [-n] filename.\n", argv[1]);
-			return 1;
+			cmpResult = strcmp(argv[1], "-n");
+			if(cmpResult != 0)
+			{
+				printf("%s is not a recognized command. Usage: ./cat1 [-n] filename.\n", argv[1]);
+				return 1;
+			}
 		}
 	}
 
 	if(argc == 1)
+	{
 		display_lines(stdin, type);
+		return 0;
+	}
 	else if(cmpResult == 0)
 	{
 		type = 2;
@@ -44,6 +50,7 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 		}
+		printf("\n");
 		return 0;
 	}
 	else
@@ -65,9 +72,9 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 		}
+		printf("\n");
 		return 0;
 	}
-	printf("\n");
 }
 
 void display_lines(FILE* fp, int type)
@@ -81,7 +88,7 @@ void display_lines(FILE* fp, int type)
 		printf("Error reading line from file.");
 		exit(1);
 	}
-	else while(fgets(line, LINELEN, fp))
+	else do 
 	{
 		if(type == 1 || type == 0)
 		{
@@ -97,5 +104,5 @@ void display_lines(FILE* fp, int type)
 			num_of_lines++;
 			lineNum++;
 		}
-	}
+	} while(fgets(line, LINELEN, fp));
 }

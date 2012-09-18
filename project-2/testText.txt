@@ -1,0 +1,12 @@
+Here is
+a file
+with some
+text to
+test against
+my cat
+program
+lets see
+if it really
+	prints out
+	what it's
+	supposed to
