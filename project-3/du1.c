@@ -1,5 +1,6 @@
 // Project 3 - du
 // Cliff Kelley
+// CS 3060
 
 #include <stdio.h>
 #include <dirent.h>
