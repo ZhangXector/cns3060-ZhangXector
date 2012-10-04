@@ -5,12 +5,12 @@
 #include <string.h>
 
 #define SUCCESS 0
-#define FAILURE 1
+#define FAILURE -1
 
 #define CURRENT_DIR "."
 #define PARENT_DIR ".."
 
-void list_directories(const char*);
+int list_directories(const char*);
 
 int main (int argc, char* argv[])
 {
@@ -26,10 +26,14 @@ int main (int argc, char* argv[])
 		}
 		else
 		{
-			//printf("%20lld B     '%s'\n", (long long)dirStats.st_size, directory);
+			int dummy = 0;
 			if(S_ISDIR(dirStats.st_mode))
 			{
-				list_directories(directory);
+				dummy = list_directories(directory);
+			}
+			else
+			{
+				printf("%8lld B     '%s'\n", (long long)dirStats.st_size, directory);
 			}
 		}
 	}
@@ -41,17 +45,17 @@ int main (int argc, char* argv[])
 	return SUCCESS;
 }
 
-void list_directories(const char* dirname)
+int list_directories(const char* dirname)
 {
 	DIR* directoryPointer;
 	struct dirent* currentEntry;
 	struct stat entryStats;
-	int dirSizes = 0;
+	int dirSizes = 4096;
 
 	if((directoryPointer = opendir(dirname)) == NULL)
 	{
 		perror(("du1: cannot open %s\n", dirname));
-		exit(1);
+		exit(-1);
 	}
 	else
 	{
@@ -64,26 +68,30 @@ void list_directories(const char* dirname)
 			{
 				perror("Failed to get file stats\n");
 			}
-			else if(strcmp(currentEntry->d_name, PARENT_DIR))
+			else if(strcmp(currentEntry->d_name, PARENT_DIR) && strcmp(currentEntry->d_name, CURRENT_DIR))
 			{
-				dirSizes += entryStats.st_size;
 				if(S_ISDIR(entryStats.st_mode))
 				{
 					char fullDir[512];
 					snprintf(fullDir, sizeof(fullDir) - 1, "%s/%s", dirname, currentEntry->d_name);
-					list_directories(fullDir);
-					printf("%20lld B     '%s/%s'\n", (long long)dirSizes, dirname, currentEntry->d_name, "");
+					if(strcmp(currentEntry->d_name, CURRENT_DIR))
+					{
+						dirSizes += list_directories(fullDir);
+					}
 				}
 				else
 				{
-					printf("%20lld B     '%s/%s'\n", (long long)entryStats.st_size, dirname, currentEntry->d_name, "");
+					dirSizes += entryStats.st_size;
+					printf("%8lld B     '%s/%s'\n", (long long)entryStats.st_size, dirname, currentEntry->d_name, "");
 				}
 			}
 		}
 		if(closedir(directoryPointer)!= SUCCESS)
 		{
 			perror("Failed to close the directory.");
-			exit(1);
+			exit(-1);
 		}
+		printf("%8lld B     '%s'\n", (long long)dirSizes, dirname);
+		return dirSizes;
 	}
 }
