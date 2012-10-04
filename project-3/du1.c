@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <string.h>
 
 #define SUCCESS 0
 #define FAILURE 1
@@ -9,16 +10,28 @@
 #define CURRENT_DIR "."
 #define PARENT_DIR ".."
 
-void list_directories(char*);
+void list_directories(const char*);
 
 int main (int argc, char* argv[])
 {
 	if (argc <= 2)
 	{
 		const char * directory = argc > 1 ? argv[1] : CURRENT_DIR;
-		printf("%s:\n", directory);
-		printf("==============================================================\n");
-		list_directories(directory);
+		struct stat dirStats;
+		
+		if(stat(directory, &dirStats) != SUCCESS)
+		{
+			printf("Not a valid file or directory: %s\n", directory);
+			return(FAILURE);
+		}
+		else
+		{
+			//printf("%20lld B     '%s'\n", (long long)dirStats.st_size, directory);
+			if(S_ISDIR(dirStats.st_mode))
+			{
+				list_directories(directory);
+			}
+		}
 	}
 	else
 	{
@@ -28,11 +41,12 @@ int main (int argc, char* argv[])
 	return SUCCESS;
 }
 
-void list_directories(char* dirname)
+void list_directories(const char* dirname)
 {
 	DIR* directoryPointer;
 	struct dirent* currentEntry;
 	struct stat entryStats;
+	int dirSizes = 0;
 
 	if((directoryPointer = opendir(dirname)) == NULL)
 	{
@@ -43,24 +57,28 @@ void list_directories(char* dirname)
 	{
 		while ((currentEntry = readdir(directoryPointer)) != NULL)
 		{
-			printf("Trying to get stats on %s\n", currentEntry->d_name);
-			if (stat(currentEntry->d_name, &entryStats) != SUCCESS) 
+			char statDirectory[512];
+			
+			snprintf(statDirectory, sizeof(statDirectory) - 1, "%s/%s", dirname, currentEntry->d_name);
+			if (stat(statDirectory, &entryStats) != SUCCESS) 
 			{
 				perror("Failed to get file stats\n");
-				//continue;
 			}
-			else if(strcmp(currentEntry->d_name, PARENT_DIR) && strcmp(currentEntry->d_name, CURRENT_DIR))
+			else if(strcmp(currentEntry->d_name, PARENT_DIR))
 			{
-				printf("Got file stats\n");
+				dirSizes += entryStats.st_size;
 				if(S_ISDIR(entryStats.st_mode))
 				{
-					printf("%s: THIS IS A DIR!\n", dirname);
-					list_directories(currentEntry->d_name);
+					char fullDir[512];
+					snprintf(fullDir, sizeof(fullDir) - 1, "%s/%s", dirname, currentEntry->d_name);
+					list_directories(fullDir);
+					printf("%20lld B     '%s/%s'\n", (long long)dirSizes, dirname, currentEntry->d_name, "");
 				}
-				printf("Size: %lld b\n", (long long)entryStats.st_size);
-				//continue;
+				else
+				{
+					printf("%20lld B     '%s/%s'\n", (long long)entryStats.st_size, dirname, currentEntry->d_name, "");
+				}
 			}
-			printf("==============================================================\n");
 		}
 		if(closedir(directoryPointer)!= SUCCESS)
 		{
