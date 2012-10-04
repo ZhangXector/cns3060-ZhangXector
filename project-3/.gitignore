@@ -10,6 +10,9 @@ du1
 # Test text files
 *.txt
 
+# Test directories
+testDir/
+
 # Compiled Object files
 *.slo
 *.lo
