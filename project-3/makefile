@@ -1,7 +1,13 @@
 all: du1
 
 du1: du1.c
-	gcc -g -Wall du1.c -o du1
+	gcc -g du1.c -o du1
+
+debug: clean du1
+	gdb du1 
 
 clean:
-	rm du1
+	rm -f du1
+
+run: clean du1
+	./du1 

@@ -1,41 +1,71 @@
 #include <stdio.h>
 #include <dirent.h>
-#include <unistd.h> // For getcwd()
+#include <sys/stat.h>
+#include <sys/types.h>
 
-void list_directories(char[]);
+#define SUCCESS 0
+#define FAILURE 1
+
+#define CURRENT_DIR "."
+#define PARENT_DIR ".."
+
+void list_directories(char*);
 
 int main (int argc, char* argv[])
 {
-	if (argc == 1)
+	if (argc <= 2)
 	{
-		return 0;
+		const char * directory = argc > 1 ? argv[1] : CURRENT_DIR;
+		printf("%s:\n", directory);
+		printf("==============================================================\n");
+		list_directories(directory);
 	}
 	else
 	{
-		while (--argc)
-		{
-			printf("%s:\n", *++argv);
-			list_directories(*argv);
-		}
+		printf("Too many arguments. Usage: ./du1 [directory]\n");
+		return FAILURE;
 	}
+	return SUCCESS;
 }
 
-void list_directories(char dirname[])
+void list_directories(char* dirname)
 {
-	DIR* dir_ptr;
-	struct dirent* direntp;
+	DIR* directoryPointer;
+	struct dirent* currentEntry;
+	struct stat entryStats;
 
-	if((dir_ptr = opendir(dirname)) == NULL)
+	if((directoryPointer = opendir(dirname)) == NULL)
 	{
-		fprintf(stderr, "du1: cannot open %s\n", dirname);
+		perror(("du1: cannot open %s\n", dirname));
 		exit(1);
 	}
 	else
 	{
-		while ((direntp = readdir(dir_ptr)) != NULL)
+		while ((currentEntry = readdir(directoryPointer)) != NULL)
 		{
-			printf("%s\n", direntp->d_name);
+			printf("Trying to get stats on %s\n", currentEntry->d_name);
+			if (stat(currentEntry->d_name, &entryStats) != SUCCESS) 
+			{
+				perror("Failed to get file stats\n");
+				//continue;
+			}
+			else if(strcmp(currentEntry->d_name, PARENT_DIR) && strcmp(currentEntry->d_name, CURRENT_DIR))
+			{
+				printf("Got file stats\n");
+				if(S_ISDIR(entryStats.st_mode))
+				{
+					printf("%s: THIS IS A DIR!\n", dirname);
+					list_directories(currentEntry->d_name);
+				}
+				printf("Size: %lld b\n", (long long)entryStats.st_size);
+				//continue;
+			}
+			printf("==============================================================\n");
 		}
-		closedir(dir_ptr);
+		if(closedir(directoryPointer)!= SUCCESS)
+		{
+			perror("Failed to close the directory.");
+			exit(1);
+		}
 	}
 }
