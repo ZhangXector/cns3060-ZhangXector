@@ -1,2 +1,5 @@
 #Python Class File
 *.pyc
+
+#In-use SWP files
+*.swp
