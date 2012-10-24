@@ -1,10 +1,14 @@
+# Cliff Kelley
+# CS3600
+
 #!/usr/bin/python
 
 import sys
 COLUMN_WIDTH = 30
 
 def main():
-
+	print 'Please enter track numbers to seek for starting from track 15. Follow each entry\nwith the <Enter> key. (Any negative number executes simulation): '
+	
 	# Current Track (Initially set to 15)
 	current_track = 15
 	
@@ -40,6 +44,7 @@ def FCFS(tracks):
 	total_tracks = 0
 	traversals = []
 
+	# Iterate through all tracks in order and find distances between them
 	i = 0
 	while i < len(tracks) - 1:
 		traverse = abs(tracks[i] - (tracks[i + 1]))
@@ -86,35 +91,54 @@ def FindClosestRecursive(origin, tracks, traversals):
 		FindClosestRecursive(closest_num, newList, traversals)
 
 def SCAN(tracks):
+	# Variables for track traversal and closest number/distance
 	total_tracks = 0
 	traversals = []
 	closest_num = 0
 	min_distance = 1000
 
+	# Find the closest number in the track list
 	for i in range(1, len(tracks)):
 		if abs(tracks[0] - tracks[i]) < min_distance:
 			min_distance = abs(tracks[0] - tracks[i])
 			closest_num = tracks[i]
+
+	# Sort the tracks
 	sorted_tracks = sorted(tracks)
+
+	# If the closest number is smaller than the current
 	if closest_num < tracks[0]:
 		# Going down
 		i = sorted_tracks.index(tracks[0])
+		
+		# Move downwards toward the lowest track number tracking track numbers
 		while i > 0:
 			traversals.append((sorted_tracks[i], sorted_tracks[i - 1], abs(sorted_tracks[i] - sorted_tracks[i - 1])))
 			i -= 1
+		
+		# Going back up
 		j = sorted_tracks.index(tracks[0]) + 1
 		traversals.append((sorted_tracks[i], sorted_tracks[j], abs(sorted_tracks[i] - sorted_tracks[j])))
+		
+		# Move back up towards the highest track number
 		while j < len(sorted_tracks) - 1:
 			traversals.append((sorted_tracks[j], sorted_tracks[j + 1], abs(sorted_tracks[j] - sorted_tracks[j + 1])))
 			j += 1
+
 	else:
 		# Going up
 		j = sorted_tracks.index(tracks[0])
+
+		# Move upwards toward the highest track number tracking track numbers
 		while j < len(sorted_tracks) - 1:
 			traversals.append((sorted_tracks[j], sorted_tracks[j + 1], abs(sorted_tracks[j] - sorted_tracks[j + 1])))	
 			j += 1
+		
+		# Going back down
 		i = sorted_tracks.index(tracks[0]) - 1
 		traversals.append((sorted_tracks[j], sorted_tracks[i], abs(sorted_tracks[j] - sorted_tracks[i])))
+
+		# Move back down towards the lowest track number
 		while i > 0:
 			traversals.append((sorted_tracks[i], sorted_tracks[i - 1], abs(sorted_tracks[i] - sorted_tracks[i - 1])))
 			i -= 1
@@ -125,6 +149,7 @@ def SCAN(tracks):
 	PrintTable('Scan-Look (Elevator)', traversals, total_tracks)
 
 def PrintTable(type, traversals, total_tracks):
+	# Formats and outputs all the values in an easy-to-read format
 	print type
 	print '{0:{width}}{1:{width}}'.format('Head Movement', 'Tracks Traversed', width = COLUMN_WIDTH)
 	
@@ -135,9 +160,11 @@ def PrintTable(type, traversals, total_tracks):
 	print '{0:{width}}{1:<{width}}\n'.format('Total Tracks Traversed', total_tracks, width = COLUMN_WIDTH)
 	print '{:=<{width}}\n'.format('=', width = COLUMN_WIDTH * 2)
 
+# If module is being run from console
 if __name__ == '__main__':
+	# If arguments are passed, inform the user that they are not allowed
 	if len(sys.argv) > 1:
 		print 'Simulation takes no arguments. Usage: \'python simulation.py\''
+	# Run main
 	else:
-		print 'Please enter track numbers to seek for starting from track 15. Follow each entry\nwith the <Enter> key. (Any negative number executes simulation): '
 		main()
