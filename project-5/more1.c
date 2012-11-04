@@ -24,12 +24,14 @@ int main(int argc, char* argv[])
 	FILE* fp;
 
 	signal(SIGINT, interrupt_sig);
-	
+
+	/*
 	if(tcgetattr(STDIN_FD, &prev_state) == ERROR)
 	{
 		perror("Unable to get the terminal state.\n");
 		return ERROR;
 	}
+	*/
 
 	if(argc == 1)
 		return display(stdin);
@@ -75,22 +77,24 @@ int display(FILE* fp)
 		return ERROR;
 	}
 	
+	/*
 	curr_state = prev_state;
 
 	curr_state.c_lflag &= ~ICANON;
 	curr_state.c_lflag &= ~ECHO;
 
-	if(tcsetattr(STDIN_FD, TCSANOW,&curr_state) == ERROR)
+	
+	if(tcsetattr(STDIN_FD, TCSANOW, &curr_state) == ERROR)
 	{
 		perror("Unable to set terminal attributes\n");
 		return ERROR;
 	}
+	*/
 
 	while (fgets(line, LINELEN, fp))
 	{
 		if(output_lines == PAGELEN)
 		{
-			double perc = displayed_lines / total_lines;
 			file_percentage = 100 * ((double)displayed_lines / (double)total_lines); 
 
 			reply = prompt_user(tty);
@@ -166,7 +170,7 @@ void interrupt_sig(int sig)
 {
 	signal(sig, SIG_IGN);
 	tcsetattr(STDIN_FD, TCSANOW, &prev_state);
-	fputs("\033[7D\033[K", stdout);
+	fputs("\033[80D\033[K", stdout);
 	printf("\nCTRL-C detected. Restoring terminal state and exiting.\n");
 	exit(0);
 }
