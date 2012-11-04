@@ -24,14 +24,12 @@ int main(int argc, char* argv[])
 	FILE* fp;
 
 	signal(SIGINT, interrupt_sig);
-
-	/*
+	
 	if(tcgetattr(STDIN_FD, &prev_state) == ERROR)
 	{
 		perror("Unable to get the terminal state.\n");
 		return ERROR;
 	}
-	*/
 
 	if(argc == 1)
 		return display(stdin);
@@ -77,19 +75,16 @@ int display(FILE* fp)
 		return ERROR;
 	}
 	
-	/*
 	curr_state = prev_state;
 
 	curr_state.c_lflag &= ~ICANON;
 	curr_state.c_lflag &= ~ECHO;
 
-	
 	if(tcsetattr(STDIN_FD, TCSANOW, &curr_state) == ERROR)
 	{
 		perror("Unable to set terminal attributes\n");
 		return ERROR;
 	}
-	*/
 
 	while (fgets(line, LINELEN, fp))
 	{
