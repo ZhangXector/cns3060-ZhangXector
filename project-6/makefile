@@ -1,15 +1,15 @@
 all: clean parta partb partc partd
 
-parta: parta.c
+parta: clean parta.c
 	gcc parta.c -o parta
 
-partb: partb.c
+partb: clean partb.c
 	gcc partb.c -o partb
 
-partc: partc.c
+partc: clean partc.c
 	gcc partc.c -o partc
 
-partd: partd.c
+partd: clean partd.c
 	gcc partd.c -o partd
 
 run: clean parta partb partc partd
