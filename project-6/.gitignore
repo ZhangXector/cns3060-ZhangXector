@@ -1,0 +1,30 @@
+# Executable
+parta
+partb
+partc
+partd
+
+# GDB Debugging
+*.dSYM/
+
+# In-use swap file
+*.swp
+
+# Test text files
+*.txt
+
+# Test directories
+testDir/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
