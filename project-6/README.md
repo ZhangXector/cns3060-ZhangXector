@@ -15,3 +15,7 @@ Part B had me a little confused at first. I wasn't sure why the count was return
 ### Part C
 ----------
 Trying out part c helped me understand why part b was giving me back 10 as a value. Because the threads were being created almost simultaneously and then sleeping for a second, there was a malfunction in the incrementation of count. However without the sleep in the function being called by the threads, part c is returning 40. I can't see why this would be happening other than that the threads are *not* actually being created simultaneously, but that the sleep was making it seem as though they were. That means that they are created in order, but are finished so quickly that they are nearly indistinguishable as ordered processes.
+
+### Part D
+----------
+Using a lock for part d was easier than I had anticipated. Unfortunately my computer is quite slow at creating threads and so running part d takes quite a while. With the locks in place the threads are correctly waiting until completion before allowing a new thread to be created (regardless of the sleep command being used in the thread function). This is correctly reading out as 40 in the terminal (albeit very slowly :D).
