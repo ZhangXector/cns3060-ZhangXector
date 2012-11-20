@@ -1,3 +1,7 @@
+// Cliff Kelley
+// CS 3060
+// Project 6 - Threads
+
 #include <stdio.h>
 #include <pthread.h>
 
@@ -13,7 +17,11 @@ int main()
 {
 	count = 0;
 	
-	pthread_mutex_init(&lock, NULL);
+	if(pthread_mutex_init(&lock, NULL) != SUCCESS)
+	{
+		perror("Unable to initialize mutex.");
+		return ERROR;
+	}
 
 	printf("\n===============================\n");
 	printf("Part D - Mutex lock for threads\n");
@@ -24,17 +32,53 @@ int main()
 	pthread_t thread3;
 	pthread_t thread4;
 
-	pthread_create(&thread1, NULL, &incrementCounter, NULL);
-	pthread_create(&thread2, NULL, &incrementCounter, NULL);
-	pthread_create(&thread3, NULL, &incrementCounter, NULL);
-	pthread_create(&thread4, NULL, &incrementCounter, NULL);
+	if(pthread_create(&thread1, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 1.");
+		return ERROR;
+	}
+	if(pthread_create(&thread2, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 2.");
+		return ERROR;
+	}
+	if(pthread_create(&thread3, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 3.");
+		return ERROR;
+	}
+	if(pthread_create(&thread4, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 4.");
+		return ERROR;
+	}
 
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
-	pthread_join(thread3, NULL);
-	pthread_join(thread4, NULL);
+	if(pthread_join(thread1, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 1.");
+		return ERROR;
+	}
+	if(pthread_join(thread2, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 2.");
+		return ERROR;
+	}
+	if(pthread_join(thread3, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 3.");
+		return ERROR;
+	}
+	if(pthread_join(thread4, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 4.");
+		return ERROR;
+	}
 
-	pthread_mutex_destroy(&lock);
+	if(pthread_mutex_destroy(&lock) != SUCCESS)
+	{
+		perror("Unable to destroy mutex.");
+		return ERROR;
+	}
 
 	printf("Count: %i\n", count);
 	printf("===============================\n\n");
@@ -44,7 +88,11 @@ int main()
 
 void * incrementCounter(void* m)
 {
-	pthread_mutex_lock(&lock);
+	if(pthread_mutex_lock(&lock) != SUCCESS)
+	{
+		perror("Unable to lock mutex.");
+		return ERROR;
+	}
 
 	int i;
 	for(i = 0; i < 10; ++i)
@@ -55,7 +103,11 @@ void * incrementCounter(void* m)
 		count = tempValue;
 	}
 
-	pthread_mutex_unlock(&lock);
+	if(pthread_mutex_unlock(&lock) != SUCCESS)
+	{
+		perror("Unable to unlock mutex.");
+		return ERROR;
+	}
 
 	return NULL;
 }

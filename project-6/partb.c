@@ -1,3 +1,7 @@
+// Cliff Kelley
+// CS 3060
+// Project 6 - Threads
+
 #include <stdio.h>
 #include <pthread.h>
 
@@ -21,15 +25,47 @@ int main()
 	pthread_t thread3;
 	pthread_t thread4;
 
-	pthread_create(&thread1, NULL, &incrementCounter, NULL);
-	pthread_create(&thread2, NULL, &incrementCounter, NULL);
-	pthread_create(&thread3, NULL, &incrementCounter, NULL);
-	pthread_create(&thread4, NULL, &incrementCounter, NULL);
+	if(pthread_create(&thread1, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 1.");
+		return ERROR;
+	}
+	if(pthread_create(&thread2, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 2.");
+		return ERROR;
+	}
+	if(pthread_create(&thread3, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 3.");
+		return ERROR;
+	}
+	if(pthread_create(&thread4, NULL, &incrementCounter, NULL) != SUCCESS)
+	{
+		perror("Unable to create thread 4.");
+		return ERROR;
+	}
 
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
-	pthread_join(thread3, NULL);
-	pthread_join(thread4, NULL);
+	if(pthread_join(thread1, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 1.");
+		return ERROR;
+	}
+	if(pthread_join(thread2, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 2.");
+		return ERROR;
+	}
+	if(pthread_join(thread3, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 3.");
+		return ERROR;
+	}
+	if(pthread_join(thread4, NULL) != SUCCESS)
+	{
+		perror("Unable to join thread 4.");
+		return ERROR;
+	}
 
 	printf("Count: %i\n", count);
 	printf("===================================\n\n");
