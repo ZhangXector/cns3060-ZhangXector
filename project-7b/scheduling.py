@@ -8,7 +8,6 @@ from copy import deepcopy
 # "Constants"
 TIME_SLICE = 4
 CONTEXT_SWITCH = 0.4
-MAX_COMPLETE_TIME = 1000
 
 #============================================================================================
 # Process Class
@@ -116,9 +115,10 @@ def SJF_Sim(inList):
 				pass
 			else:
 				# Find the shortest complete time and start processing it
+				max_complete_time = 1000
 				for those in readyList:
-					if those.complete < MAX_COMPLETE_TIME:
-						MAX_COMPLETE_TIME = those.complete
+					if those.complete < max_complete_time:
+						max_complete_time = those.complete
 						processing = those
 				procTime = processing.complete
 				readyList.remove(processing)
@@ -171,10 +171,11 @@ def SJR_Sim(inList):
 			else:
 				# Combine lists to check through all waiting processes
 				checkList = readyList + waitList
+				max_complete_time = 1000
 				for those in checkList:
 					# Find the shortest complete time and start processing it
-					if those.complete < MAX_COMPLETE_TIME:
-						MAX_COMPLETE_TIME = those.complete
+					if those.complete < max_complete_time:
+						max_complete_time = those.complete
 						processing = those
 				# Set the wait time on the first process cycle
 				if processing.firstProcess:
