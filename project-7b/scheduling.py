@@ -24,8 +24,8 @@ class Process(object):
 	# Overloaded string
 	def __str__(self):
 		return_string = "\nProcess " + str(self.pid) + ":\n  Arrival Time: " + str(self.arrival) +\
-				" - Completion Time: " + str(self.complete) + " - Wait Time: " + str(self.wait) +\
-				" - Turnaround: " + str(self.turnaround)
+				" - Completion Time: " + str(self.complete) + " - Wait Time: {0:.4g}".format(self.wait) +\
+				" - Turnaround: {0:.4g}".format(self.turnaround)
 		return return_string
 #============================================================================================
 
@@ -35,22 +35,35 @@ class Process(object):
 #--------------------------------------------------------------------------------------------
 def main(inList):
 	
-	print "==================================================================================",
+	print "============================================================================",
 	print "\nFirst Come First Serve",
-	print "\n----------------------------------------------------------------------------------",
+	print "\n----------------------------------------------------------------------------",
 	CalcTimes(inList)
 
-	print "\n==================================================================================",
+	print "\n============================================================================",
 	print "\nShortest Job First",
-	print "\n----------------------------------------------------------------------------------",
+	print "\n----------------------------------------------------------------------------",
 
 	CalcTimes(SJF_Sim(inList))
 	
-	print "\n==================================================================================",
+	print "\n============================================================================",
 	print "\nShortest Job Remaining",
-	print "\n----------------------------------------------------------------------------------",
+	print "\n----------------------------------------------------------------------------",
 
 	SJR_Sim(inList)
+
+	print "\n============================================================================",
+	print "\nRound Robin",
+	print "\n----------------------------------------------------------------------------",
+
+	RR_Sim(inList, False)
+
+	print "\n============================================================================",
+	print "\nRound Robin with Context Switch Time",
+	print "\n----------------------------------------------------------------------------",
+
+	RR_Sim(inList, True)
+
 #============================================================================================
 
 #============================================================================================
@@ -81,8 +94,8 @@ def CalcTimes(inList):
 	# Print all process and averages
 	for each in inList:
 		print each,
-	print "\n\nAverage Wait: {0:.3g} - Average Turnaround: {1:.3g}".format(avg_wait, avg_turn)
-	print "==================================================================================",
+	print "\n\nAverage Wait: {0:.4g} - Average Turnaround: {1:.4g}".format(avg_wait, avg_turn)
+	print "============================================================================",
 #============================================================================================
 
 #============================================================================================
@@ -205,32 +218,6 @@ def SJR_Sim(inList):
 				# Remove the process from the ready list
 				readyList.remove(processing)
 
-		# Debugging/testing print statements
-		'''
-		print "\n============================================================"
-		print "Time: {0}  ----   Processing Time: {1}".format(str(time), str(procTime))
-		print "============================================================"
-		
-		if processing == None:
-			pass
-		else:
-			print "Currently Processing: Process {0}".format(processing.pid)
-			print processing
-
-		print "\nProcess List: ",
-		for each in procList:
-			print each,
-		print "\nReady List: ",
-		for each in readyList:
-			print each,
-		print "\nWait List: ",
-		for each in waitList:
-			print each,
-		print "\nFinished List: ",
-		for each in finishedList:
-			print each,
-		'''
-
 		# Increment time
 		time += 1
 		# Decrement process complete time
@@ -267,9 +254,104 @@ def SJR_Sim(inList):
 	# Print all process and averages
 	for each in finishedList:
 		print each,
-	print "\n\nAverage Wait: {0:.3g} - Average Turnaround: {1:.3g}".format(avg_wait, avg_turn)
-	print "==================================================================================",
+	print "\n\nAverage Wait: {0:.4g} - Average Turnaround: {1:.4g}".format(avg_wait, avg_turn)
+	print "============================================================================",
 #============================================================================================
+
+#============================================================================================
+# Round Robin Simulation
+#--------------------------------------------------------------------------------------------
+def RR_Sim(inList, ContextSwitchTime):
+	# Create deep copy of input list
+	procList = deepcopy(inList)
+
+	finishedList = []
+	readyList = []
+	processing = None
+	procTime = 0
+	time = 0
+
+	# While loop to visit all processes
+	finished_all_procs = False
+	while not finished_all_procs:
+		for each in procList:
+			if time >= each.arrival:
+				# Move process to ready list when arrived
+				readyList.append(each)
+				procList.remove(each)
+		if processing != None and procTime == 0:
+			if processing.complete > 0:
+				readyList.append(processing)
+			else:
+				# Calculate process turnaround
+				processing.turnaround = time - processing.arrival
+
+				# Move finished process to finished list
+				finishedList.append(processing)
+
+			# Add context switch time if desired
+			if ContextSwitchTime:
+				time += CONTEXT_SWITCH
+			processing = None
+		if processing == None:
+			if len(readyList) == 0:
+				pass
+			else:
+				# Start processing the next item in the queue
+				processing = readyList.pop(0)
+
+				# Set the wait time on the first process cycle
+				if processing.firstProcess:
+					processing.wait = time - processing.arrival
+					processing.firstProcess = False
+				# Set processing time to the complete time for the process
+				# unless the process complete time is greater than the time slice
+				# 
+				if processing.complete > TIME_SLICE:
+					procTime = TIME_SLICE
+				else:
+					procTime = processing.complete
+
+		# Increment time
+		time += 1
+		# Decrement process complete time
+		procTime -= 1
+		
+		# Decrement process time if there is one processing
+		if processing != None:
+			processing.complete -= 1
+
+		# Detect if all processes have finished
+		if len(procList) == 0 and len(readyList) == 0 and processing == None:
+			finished_all_procs = True
+	
+	# Sort list based on process ID
+	finishedList.sort(key=lambda process: process.pid)
+	
+	i = 0
+	avg_wait = 0
+	avg_turn = 0
+	
+	# Iterate through list
+	while i < len(finishedList):
+		# Calculate times
+		avg_wait += finishedList[i].wait
+		avg_turn += finishedList[i].turnaround
+		# Reset complete time values to original
+		finishedList[i].complete = inList[i].complete
+		i += 1
+
+	# Calculate averages
+	avg_wait /= len(finishedList)
+	avg_turn /= len(finishedList)
+	
+	# Print all process and averages
+	for each in finishedList:
+		print each,
+	print "\n\nAverage Wait: {0:.4g} - Average Turnaround: {1:.4g}".format(avg_wait, avg_turn)
+	print "============================================================================",
+#============================================================================================
+
 
 #============================================================================================
 # Terminal interaction and STDIN read
